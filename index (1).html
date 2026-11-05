@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Bolsillo U</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bolsillo U">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#090d0b">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f1f5f2;--card:#ffffff;--card2:#f5f8f6;--tx:#12201a;--mut:#64736a;--line:#e1e8e4;--pri:#0f9f57;--pri-tx:#ffffff;--ok:#0f9f57;--warn:#d98e00;--bad:#e0464b;--soft:#e4f3ea;--shadow:0 1px 2px rgba(16,40,28,.05),0 8px 24px rgba(16,40,28,.06);--glow:rgba(15,159,87,.16)}
+:root[data-theme=dark]{--bg:#090d0b;--card:#131916;--card2:#1a221e;--tx:#ecf3ee;--mut:#8b998f;--line:#222c27;--pri:#22d07c;--pri-tx:#04210f;--ok:#22d07c;--warn:#f5b73b;--bad:#ff5d62;--soft:#17261e;--shadow:none;--glow:rgba(34,208,124,.22)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#090d0b;--card:#131916;--card2:#1a221e;--tx:#ecf3ee;--mut:#8b998f;--line:#222c27;--pri:#22d07c;--pri-tx:#04210f;--ok:#22d07c;--warn:#f5b73b;--bad:#ff5d62;--soft:#17261e;--shadow:none;--glow:rgba(34,208,124,.22)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color:var(--tx);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px calc(118px + env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 0 6px;gap:10px}
+.top h1{font-size:26px;margin:0;letter-spacing:-.4px}.top .sub{font-size:13px;color:var(--mut)}
+.ibtn{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--tx);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.ibtn svg{width:20px;height:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+.hero{background:radial-gradient(130% 110% at 0% 0%,var(--glow),transparent 62%),var(--card)}
+.lbl{font-size:13px;color:var(--mut)}
+.amount{font-size:40px;font-weight:800;letter-spacing:-1.2px;margin:2px 0 8px;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px}
+.pill svg{width:15px;height:15px}
+.pill.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 17%,transparent);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.duo>div{background:var(--card2);border-radius:16px;padding:10px 12px}
+.duo b{display:block;font-size:18px;margin-top:2px;font-variant-numeric:tabular-nums}
+.pos{color:var(--ok)}.neg{color:var(--bad)}.mut{color:var(--mut)}
+.sec-h{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 6px}
+.sec-h h2{font-size:18px;margin:0;letter-spacing:-.2px}
+.more{color:var(--pri);font-size:14px;font-weight:600;background:none;border:0;padding:4px}
+.strip{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 8px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}.strip::-webkit-scrollbar{display:none}
+.day{flex:none;width:86px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.day .dn{font-size:12px;color:var(--mut);text-transform:capitalize}.day .dd{font-size:20px;font-weight:800;line-height:1}
+.day .dm{font-size:13px;font-weight:700}.day .st{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px}
+.day.ok{border-color:color-mix(in srgb,var(--ok) 50%,var(--line))}.day.ok .st{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.day.warn{border-color:color-mix(in srgb,var(--warn) 55%,var(--line))}.day.warn .st{background:color-mix(in srgb,var(--warn) 17%,transparent);color:var(--warn)}
+.day.bad{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}.day.bad .st{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.day.nor .st{background:var(--card2);color:var(--mut)}
+.badge{border-radius:30%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;flex:none;line-height:1}
+.rings{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:6px 16px 8px;scrollbar-width:none}.rings::-webkit-scrollbar{display:none}
+.ringc{flex:none;width:112px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 8px;text-align:center}
+.ring{position:relative;width:76px;height:76px;margin:0 auto 6px}.ring .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px}
+.ring .in small{font-size:11px;font-weight:800;color:var(--tx);margin-top:1px}
+.ringc .t{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:10px;background:var(--card2);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;border-radius:99px;background:var(--pri)}
+.rowx{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}
+.item .mid{flex:1;min-width:0}.item .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.item .s{font-size:12.5px;color:var(--mut);margin-top:2px}
+.item .r{text-align:right;flex:none;font-weight:700;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--mut);font-weight:700;margin-left:4px;vertical-align:1px}
+.tag.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}.tag.warn{background:color-mix(in srgb,var(--warn) 17%,transparent);color:var(--warn)}.tag.bad{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.tip{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:10px 0;font-size:14px;line-height:1.4}
+.tip .e{font-size:18px;line-height:1.2}
+.seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;padding:9px 6px;border-radius:10px;color:var(--mut);font-weight:700;font-size:14px}
+.seg button.on{background:var(--pri);color:var(--pri-tx)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0;margin:0 -16px;padding-left:16px;padding-right:16px}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--tx);padding:8px 13px;border-radius:999px;font-size:13.5px;font-weight:600;white-space:nowrap}
+.chip.on{background:var(--pri);color:var(--pri-tx);border-color:transparent}
+.btn{background:var(--pri);color:var(--pri-tx);border:0;border-radius:14px;padding:12px 16px;font-size:15px;font-weight:700}
+.btn.sec{background:var(--card2);color:var(--tx);border:1px solid var(--line)}.btn.sm{padding:7px 12px;font-size:13px;border-radius:11px}.btn.red{background:var(--bad);color:#fff}.btn.full{width:100%;margin-top:10px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+nav.tab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(500px,calc(100% - 24px));background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:26px;display:flex;align-items:center;padding:6px;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.16)}
+nav.tab button{flex:1;background:none;border:0;color:var(--mut);font-size:10.5px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font-weight:600}
+nav.tab button.on{color:var(--pri)}nav.tab svg{width:22px;height:22px}
+nav.tab .plus{flex:none;width:58px;height:58px;border-radius:50%;background:var(--pri);color:var(--pri-tx);margin:-26px 6px 0;justify-content:center;box-shadow:0 8px 24px var(--glow),0 0 0 6px var(--bg)}
+nav.tab .plus svg{width:28px;height:28px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;text-align:center}
+.cal .h{font-size:12px;color:var(--mut);padding:2px 0 4px;font-weight:600}
+.cd{aspect-ratio:1;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative;font-size:14px;font-weight:600;background:var(--card)}
+.cd.pay{border:1.5px dashed var(--ok)}.cd.today{background:var(--pri);color:var(--pri-tx);border-color:transparent}
+.cd.sel{box-shadow:0 0 0 2px var(--tx)}.cd.has{background:var(--card2)}
+.cd .mk{position:absolute;right:-5px;bottom:-5px}.cd .n{position:absolute;top:-5px;right:-5px;background:var(--bad);color:#fff;font-size:9.5px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.donutw{display:flex;gap:14px;align-items:center}
+.donut{position:relative;width:150px;height:150px;flex:none}.donut .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.donut .ctr b{font-size:19px;font-variant-numeric:tabular-nums}.donut .ctr span{font-size:11px;color:var(--mut)}
+.lg{flex:1;min-width:0}.lg .li{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px}
+.lg .li i{width:10px;height:10px;border-radius:50%;flex:none}.lg .li .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lg .li .p{color:var(--mut);font-size:12px}
+.mbar{margin:10px 0}.mbar .bar{height:8px;margin-top:6px}
+.goal{border-radius:20px;padding:15px;margin:12px 0;border:1.5px solid var(--line)}
+.goal .ttl{font-weight:800;font-size:16px;line-height:1.25}
+.goal .pct{font-weight:800;font-size:15px}
+.goal .hint{display:flex;gap:8px;align-items:center;margin-top:10px;background:color-mix(in srgb,var(--card) 70%,transparent);border-radius:12px;padding:8px 10px;font-size:13px}
+.prod{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.prod img{width:72px;height:72px;object-fit:contain;border-radius:14px;background:#fff;flex:none}
+.lnk{color:var(--pri);font-size:13px;text-decoration:none;font-weight:700}
+.tot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.tot>div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
+.tot b{display:block;font-size:22px;margin-top:2px;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stats>div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.stats b{display:block;font-size:20px;margin-top:4px;font-variant-numeric:tabular-nums}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:9}.modal.on{display:flex}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+.sheet.full{height:100%;max-height:100%;border-radius:0;display:flex;flex-direction:column;padding-top:calc(12px + env(safe-area-inset-top));background:var(--bg)}
+.sheet h2{margin:0 0 6px;font-size:20px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px;font-weight:600}
+input,select,textarea{width:100%;font-size:16px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--tx);-webkit-appearance:none;font-family:inherit}
+textarea{min-height:80px;resize:vertical}
+.cap-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cap-top b{font-size:15px;letter-spacing:.6px}
+.amt{text-align:center;font-size:58px;font-weight:800;letter-spacing:-2px;margin:14px 0 6px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden}
+.amt small{font-size:14px;color:var(--mut);letter-spacing:0;font-weight:700;margin-left:4px}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.keys button{height:58px;border-radius:18px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:25px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.keys button svg{width:26px;height:26px}
+.cap-in{display:grid;grid-template-columns:1fr 140px;gap:8px;margin-top:10px}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90%}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.demo{background:var(--warn);color:#000;text-align:center;font-size:12px;padding:4px;font-weight:600}
+.empty{color:var(--mut);font-size:14px;text-align:center;padding:12px}
+.hidden{display:none!important}
+.ins{display:grid;gap:10px}.ins .bar{height:12px}
+.search{margin:8px 0}
+.datehead{font-size:12.5px;color:var(--mut);font-weight:700;margin:16px 2px 0;text-transform:capitalize}
+.lock{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
+.lock img{width:96px;height:96px;border-radius:24px}
+.bigb{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 4px}
+</style>
+</head>
+<body>
+<div id="demo" class="demo hidden">Vista previa con datos de ejemplo</div>
+<div class="wrap" id="app"><div class="empty" style="padding-top:40vh">Cargando…</div></div>
+<nav class="tab" id="nav"></nav>
+<div class="modal" id="modal" onclick="if(event.target===this)cerrar()"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<div class="lock hidden" id="lock"><img src="icon-180.png" alt="" onerror="this.style.display='none'"><h2 style="margin:0">Bolsillo U</h2><div class="lbl">Desbloquea para ver tus finanzas</div><button class="btn" style="padding:14px 22px" onclick="desbloquear()">🔓 Desbloquear con Face ID</button></div>
+<script>
+/* ================= utilidades ================= */
+const GAS = typeof google !== 'undefined' && google.script && google.script.run;
+const LS = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+let TOKEN = LS.get('mf_token', ''), THEME = LS.get('mf_theme', 'auto'), URL_API = LS.get('mf_url', '');
+const ES_ARCHIVO = location.protocol === 'file:' || /claude|anthropic|usercontent\.goog/.test(location.host);
+const MODO = () => GAS ? 'gas' : URL_API ? 'web' : 'demo';
+let DB = null, TAB = 'inicio', SUB = 'metas', PER = 'mes', CAL = null, charts = [], MQ = '', MF = 'todos';
+const $ = s => document.querySelector(s);
+const money = n => (n < 0 ? '-$' : '$') + Math.round(Math.abs(Number(n) || 0)).toLocaleString('es-MX');
+const money2 = n => '$' + (Number(n) || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const pd = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, (m || 1) - 1, d || 1); };
+const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addD = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const dias = (a, b) => Math.round((sod(a) - sod(b)) / 864e5);
+const dim = (y, m) => new Date(y, m + 1, 0).getDate();
+const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DSEM = ['dom','lun','mar','mié','jue','vie','sáb'];
+const fcorta = d => d.getDate() + ' ' + MES[d.getMonth()].slice(0, 3);
+const flarga = d => DSEM[d.getDay()] + ' ' + d.getDate() + ' de ' + MES[d.getMonth()];
+const cap1 = s => s.charAt(0).toUpperCase() + s.slice(1);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sum = (a, f = x => x.monto) => a.reduce((s, x) => s + (Number(f(x)) || 0), 0);
+const lastFriday = d => addD(sod(d), -((d.getDay() - 5 + 7) % 7));
+const enDias = n => n === 0 ? 'Hoy' : n === 1 ? 'Mañana' : n < 0 ? 'Hace ' + (-n) + ' d' : 'En ' + n + ' días';
+function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2300); }
+
+/* ================= íconos ================= */
+const ic = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const I = {
+  home: ic('<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
+  chart: ic('<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>'),
+  cal: ic('<rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 10h18"/>'),
+  target: ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>'),
+  plus: ic('<path d="M12 5v14M5 12h14"/>'),
+  gear: ic('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/>'),
+  back: ic('<path d="M15 18l-6-6 6-6"/>'),
+  del: ic('<path d="M21 5H9l-7 7 7 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-5 5M12 9l5 5"/>'),
+  check: ic('<path d="M20 6 9 17l-5-5"/>'),
+  alert: ic('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'),
+  ref: ic('<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>'),
+  list: ic('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>')
+};
+
+/* ================= marcas, categorías y colores ================= */
+const BRAND = [
+  [/claude|anthropic/i, '#d97757', '✳'], [/chatgpt|openai/i, '#10a37f', '◎'], [/google ai|gemini/i, '#4f7cff', '✦'],
+  [/fotos|photos/i, '#f4b400', '✿'], [/google/i, '#4285f4', 'G'], [/icloud|apple/i, '#3a8ee6', '☁'],
+  [/netflix/i, '#e50914', 'N'], [/spotify/i, '#1db954', '♫'], [/youtube/i, '#ff0033', '▶'], [/disney/i, '#113ccf', 'D'],
+  [/celular|telcel|at&t|movistar|bait|plan/i, '#7c5cff', '📶'], [/seguro/i, '#ff8a3d', '🛡'],
+  [/colegiatura|universidad|escuela|upy/i, '#14b8a6', '🎓'], [/moto/i, '#ff8a3d', '🏍'], [/gasolin|pemex/i, '#e0464b', '⛽'],
+  [/beca|bienestar|benito/i, '#9d2449', '🏛'], [/comida|taquer|oxxo|cocina/i, '#f59e0b', '🍔'], [/gusto|salida/i, '#a855f7', '🎉'], [/didi/i, '#ff7a00', '🏍'], [/gallito|abarrote|sueldo/i, '#0f9f57', '🏪']
+];
+const CAT = {
+  Comida: ['🍔', '#f5a524'], Gasolina: ['⛽', '#ff5d62'], Gustos: ['🎉', '#b07cff'], Suscripciones: ['💳', '#4f9dff'], Escuela: ['🎓', '#14b8a6'],
+  Moto: ['🏍', '#ff8a3d'], Celular: ['📱', '#7c5cff'], Salud: ['💊', '#ff7aa8'], Transporte: ['🚌', '#00b4d8'], Efectivo: ['💵', '#22c55e'],
+  Deudas: ['🤝', '#a1887f'], Otros: ['📦', '#8b998f'], Sueldo: ['🏪', '#22c55e'], Didi: ['🏍', '#ff7a00'], Beca: ['🏛', '#9d2449'], 'Otros ingresos': ['💰', '#22c55e'],
+  Metas: ['🎯', '#22c55e'], Rechazado: ['⛔', '#8b998f']
+};
+const CATS_G = ['Comida', 'Gasolina', 'Gustos', 'Suscripciones', 'Escuela', 'Moto', 'Celular', 'Salud', 'Transporte', 'Efectivo', 'Deudas', 'Otros'];
+const CATS_I = ['Sueldo', 'Didi', 'Beca', 'Otros ingresos'];
+const META_COL = ['#22c55e', '#f5b73b', '#4f9dff', '#b07cff', '#ff7aa8', '#14b8a6'];
+const catE = c => (CAT[c] || CAT.Otros)[0], catC = c => (CAT[c] || CAT.Otros)[1];
+function badge(name, size = 38, cat) {
+  const b = BRAND.find(([re]) => re.test(name || ''));
+  const [bg, tx] = b ? [b[1], b[2]] : cat ? [catC(cat), catE(cat)] : ['#64748b', String(name || '?').trim().charAt(0).toUpperCase()];
+  return `<span class="badge" style="width:${size}px;height:${size}px;background:${bg};font-size:${Math.round(size * .46)}px">${esc(tx)}</span>`;
+}
+function metaEmoji(n) {
+  n = String(n || '').toLowerCase();
+  return /moto/.test(n) ? '🏍' : /laptop|compu|pc/.test(n) ? '💻' : /cel|iphone|bater/.test(n) ? '📱' : /escuela|colegi|univers/.test(n) ? '🎓' : /casco/.test(n) ? '⛑' : /viaje/.test(n) ? '✈' : '🎯';
+}
+function ring(p, col, inner, label) {
+  const r = 31, c = 2 * Math.PI * r, v = Math.max(0, Math.min(1, p));
+  return `<div class="ring"><svg width="76" height="76" viewBox="0 0 76 76"><circle cx="38" cy="38" r="${r}" fill="none" stroke="var(--card2)" stroke-width="7"/>
+  <circle cx="38" cy="38" r="${r}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - v)}" transform="rotate(-90 38 38)"/></svg>
+  <div class="in">${inner}<small>${label}</small></div></div>`;
+}
+
+/* ================= datos ================= */
+function api(fn, ...a) {
+  return new Promise((res, rej) => {
+    if (MODO() === 'web') {
+      fetch(URL_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, token: TOKEN, args: a }) })
+        .then(r => r.json()).then(j => j.ok ? res(j.data) : rej(new Error(j.error))).catch(() => rej(new Error('Sin conexión con tu Google Sheet')));
+      return;
+    }
+    if (!GAS) { try { res(DEMO[fn](...a)); } catch (e) { rej(e); } return; }
+    google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](TOKEN, ...a);
+  }).then(d => { if (d && d.movimientos) { DB = norm(d); render(); } return d; })
+    .catch(e => { const m = (e && e.message) || String(e); if (/Token/.test(m)) { if (TOKEN) toast('⚠️ ' + m); pedirToken(); return; } toast('⚠️ ' + m); });
+}
+function norm(d) {
+  d.movimientos.forEach(m => { m.monto = +m.monto || 0; });
+  d.fijos.forEach(f => { f.monto = +f.monto || 0; f.dia = +f.dia || 0; });
+  d.metas.forEach(m => { m.objetivo = +m.objetivo || 0; m.ahorrado = +m.ahorrado || 0; m.prioridad = +m.prioridad || 9; m.precio = +m.precio || 0; });
+  d.deudas.forEach(x => { x.monto = +x.monto || 0; x.pendiente = +x.pendiente || 0; });
+  return d;
+}
+const activos = () => DB.fijos.filter(f => f.activo !== 'no');
+const esIng = f => f.tipo === 'ingreso';
+const recurrentes = () => activos().filter(f => f.frecuencia === 'mensual' || f.frecuencia === 'bimestral');
+const mensuales = () => recurrentes().filter(f => !esIng(f));      // pagos fijos (mensuales y cada 2 meses)
+const ingresosFijos = () => recurrentes().filter(esIng);           // ej. Beca del Bienestar
+const alMes = f => f.frecuencia === 'bimestral' ? f.monto / 2 : f.monto;
+const FREQ = { mensual: 'Mensual', bimestral: 'Cada 2 meses', semanal: 'Presupuesto semanal' };
+const semanales = () => activos().filter(f => f.frecuencia === 'semanal' && !esIng(f));
+function ocurrencia(f, y, m) { return new Date(y, m, Math.min(f.dia || 1, dim(y, m))); }
+function cubierto(f, occ) {
+  const tp = esIng(f) ? 'ingreso' : 'gasto';
+  return DB.movimientos.some(m => m.tipo === tp && (m.fuente === 'fijo:' + f.id || (esIng(f) && m.categoria === f.categoria)) && dias(pd(m.fecha), occ) >= -10 && dias(pd(m.fecha), occ) <= 20);
+}
+/** ¿Toca este mes? (los de cada 2 meses se cuentan desde su fecha "inicio") */
+function tocaMes(f, y, m) {
+  if (f.frecuencia !== 'bimestral') return true;
+  const a = f.inicio ? pd(f.inicio) : new Date(y, m, 1);
+  return (((y * 12 + m) - (a.getFullYear() * 12 + a.getMonth())) % 2 + 2) % 2 === 0;
+}
+/** Fechas de cobro (o de ingreso) entre dos fechas. Por defecto solo pagos; lista = qué fijos revisar */
+function cobros(desde, hasta, lista) {
+  const out = [];
+  (lista || mensuales()).forEach(f => {
+    for (let y = desde.getFullYear(), m = desde.getMonth() - 1; new Date(y, m, 1) <= hasta; m++) {
+      if (!tocaMes(f, new Date(y, m, 1).getFullYear(), new Date(y, m, 1).getMonth())) continue;
+      const o = ocurrencia(f, y, m);
+      if (o >= sod(desde) && o <= hasta) out.push({ f, fecha: o, pagado: cubierto(f, o) });
+    }
+  });
+  return out.sort((a, b) => a.fecha - b.fecha);
+}
+function calc() {
+  const hoy = sod(new Date()), cfg = DB.config, M = DB.movimientos;
+  const inicio = cfg.INICIO ? pd(cfg.INICIO) : addD(hoy, -365);
+  const t = tp => sum(M.filter(m => m.tipo === tp));
+  const balance = (+cfg.SALDO_INICIAL || 0) + t('ingreso') - t('gasto') - t('ahorro') + t('retiro_ahorro');
+  const vie = lastFriday(hoy), sem = M.filter(m => pd(m.fecha) >= vie);
+  const lista = cobros(addD(hoy, -25), addD(hoy, 31));
+  const vencidos = lista.filter(x => x.fecha < hoy && x.fecha >= inicio && !x.pagado);
+  const prox7 = lista.filter(x => x.fecha >= hoy && dias(x.fecha, hoy) <= 7 && !x.pagado);
+  const sems = semanales().map(f => { const g = sum(sem.filter(m => m.tipo === 'gasto' && m.categoria === f.categoria)); return { ...f, gastado: g, resta: Math.max(0, f.monto - g) }; });
+  const necesita = sum(vencidos, x => x.f.monto) + sum(prox7, x => x.f.monto) + sum(sems, x => x.resta);
+  const colchon = +cfg.COLCHON || 0;
+  const estado = balance >= necesita + colchon ? 'ok' : balance >= necesita ? 'warn' : 'bad';
+  const didi = M.filter(m => m.tipo === 'ingreso' && m.categoria === 'Didi');
+  const didiProm = didi.length ? sum(didi) / didi.length : 0;
+  const ahorroSem = (t2 => t2 / 4)(sum(M.filter(m => m.tipo === 'ahorro' && pd(m.fecha) >= addD(hoy, -28)))) ;
+  const mesG = M.filter(m => m.tipo === 'gasto' && pd(m.fecha).getMonth() === hoy.getMonth() && pd(m.fecha).getFullYear() === hoy.getFullYear());
+  const gastoMes = sum(mesG);
+  const proyMes = sum(mensuales(), alMes) + sum(semanales()) * 4.33;
+  const proxIng = cobros(hoy, addD(hoy, 75), ingresosFijos()).filter(x => !x.pagado);
+  const presupuesto = +cfg.PRESUPUESTO_MES || Math.round(proyMes);
+  return {
+    hoy, vie, balance, lista, proxIng, vencidos, prox7, sems, necesita, colchon, estado, didiProm, ahorroSem, gastoMes, proyMes, presupuesto,
+    falta: Math.max(0, necesita - balance), libre: balance - necesita - colchon,
+    ingSem: sum(sem.filter(m => m.tipo === 'ingreso')), gasSem: sum(sem.filter(m => m.tipo === 'gasto'))
+  };
+}
+function consejos(c) {
+  const t = [], metas = DB.metas.filter(m => m.ahorrado < m.objetivo).sort((a, b) => a.prioridad - b.prioridad);
+  if (c.estado === 'bad') {
+    t.push(['🛑', `Te faltan <b>${money(c.falta)}</b> para cubrir lo de los próximos 7 días. Frena los gustos hasta tu próximo pago.`]);
+    t.push(['🏍', c.didiProm ? `Con unas <b>${Math.ceil(c.falta / c.didiProm)}</b> salida(s) de Didi lo cubres (promedias ${money(c.didiProm)}).` : 'Un par de tardes de Didi te ayudarían a cubrir lo que falta.']);
+  } else if (c.estado === 'warn') t.push(['⚠️', 'Alcanzas, pero te quedas sin colchón. Evita gastos que no tengas planeados esta semana.']);
+  else if (c.libre > 50 && metas[0]) t.push(['💪', `Te sobran <b>${money(c.libre)}</b>. Manda una parte a <b>${esc(metas[0].nombre)}</b>.`]);
+  c.sems.filter(s => s.gastado > s.monto).forEach(s => t.push(['🔥', `Ya te pasaste <b>${money(s.gastado - s.monto)}</b> en ${esc(s.nombre)} esta semana.`]));
+  return t;
+}
+
+/* ================= navegación ================= */
+const TABS = [['inicio', 'home', 'Inicio'], ['analisis', 'chart', 'Análisis'], ['+'], ['cal', 'cal', 'Calendario'], ['metas', 'target', 'Metas']];
+function go(t) { TAB = t; render(); window.scrollTo(0, 0); }
+function render() {
+  if (!DB) return;
+  const act = { subs: 'inicio', movs: 'inicio' }[TAB] || TAB;
+  $('#nav').innerHTML = TABS.map(([k, i, l]) => k === '+' ? `<button class="plus" onclick="abrirCaptura()" aria-label="Nueva captura">${I.plus}</button>`
+    : `<button class="${act === k ? 'on' : ''}" onclick="go('${k}')">${I[i]}${l}</button>`).join('');
+  charts.forEach(ch => ch.destroy()); charts = [];
+  const c = calc();
+  $('#app').innerHTML = ({ inicio: vInicio, analisis: vAnalisis, cal: vCal, metas: vMetas, subs: vSubs, movs: vMovs })[TAB](c);
+  if (TAB === 'analisis') dibujar(c);
+  if (TAB === 'movs') pintarMovs();
+}
+const topbar = (titulo, sub, der = '', back = false) => `<div class="top">${back ? `<button class="ibtn" onclick="go('inicio')">${I.back}</button>` : ''}
+  <div style="flex:1;min-width:0">${sub ? `<div class="sub">${sub}</div>` : ''}<h1>${titulo}</h1></div>${der}</div>`;
+const secH = (t, btn = '') => `<div class="sec-h"><h2>${t}</h2>${btn}</div>`;
+
+/* ================= INICIO ================= */
+function vInicio(c) {
+  const pill = { ok: `<span class="pill ok">${I.check} Cubierto</span>`, warn: `<span class="pill warn">${I.alert} Justo, sin colchón</span>`, bad: `<span class="pill bad">${I.alert} Te faltan ${money(c.falta)}</span>` }[c.estado];
+  const msg = { ok: `Pagas todo lo de los próximos 7 días y te sobran <b>${money(c.libre)}</b>.`, warn: 'Cubres lo de los próximos 7 días, pero sin colchón.', bad: 'No alcanzas a cubrir lo de los próximos 7 días.' }[c.estado];
+  const strip = c.lista.filter(x => x.fecha >= c.hoy || (!x.pagado && x.fecha >= (DB.config.INICIO ? pd(DB.config.INICIO) : x.fecha))).slice(0, 12);
+  const usado = c.presupuesto ? c.gastoMes / c.presupuesto : 0;
+  const metas = DB.metas.slice().sort((a, b) => a.prioridad - b.prioridad);
+  const subsM = sum(mensuales().filter(f => f.categoria === 'Suscripciones'), alMes);
+  const movs = DB.movimientos.slice().sort((a, b) => pd(b.fecha) - pd(a.fecha)).slice(0, 6);
+  return topbar('Hola, ' + esc(DB.config.NOMBRE || ''), cap1(flarga(c.hoy)), `<button class="ibtn" onclick="ajustes()" aria-label="Ajustes">${I.gear}</button>`) + `
+  <div class="card hero">
+    <div class="lbl">Disponible</div>
+    <div class="amount">${money2(c.balance)}</div>
+    ${pill}<div class="lbl" style="margin-top:8px">${msg}</div>
+    <div class="duo"><div><span class="lbl">Ganado esta semana</span><b class="pos">+${money(c.ingSem)}</b></div><div><span class="lbl">Gastado esta semana</span><b class="neg">-${money(c.gasSem)}</b></div></div>
+  </div>
+  ${c.proxIng.slice(0, 2).map(x => `<div class="card" onclick="abrirFijo('${x.f.id}')" style="display:flex;align-items:center;gap:12px;cursor:pointer;border-color:color-mix(in srgb,var(--ok) 40%,var(--line))">${badge(x.f.nombre, 42, x.f.categoria)}
+    <div style="flex:1;min-width:0"><div class="lbl">Próximo ingreso fijo</div><div style="font-weight:700">${esc(x.f.nombre)}</div><div class="lbl">${cap1(flarga(x.fecha))} · ${enDias(dias(x.fecha, c.hoy)).toLowerCase()}</div></div><b class="pos" style="font-size:18px">+${money(x.f.monto)}</b></div>`).join('')}
+  ${consejos(c).map(([e, t]) => `<div class="tip"><span class="e">${e}</span><span>${t}</span></div>`).join('')}
+  ${secH('Próximos pagos', `<button class="more" onclick="go('cal')">Calendario</button>`)}
+  <div class="strip">${strip.map(x => {
+    const n = dias(x.fecha, c.hoy), cls = x.pagado ? 'ok' : n < 0 ? 'bad' : n <= 3 ? 'warn' : 'nor';
+    const st = x.pagado ? 'Pagado' : n < 0 ? 'Vencido' : n === 0 ? 'Hoy' : n === 1 ? 'Mañana' : n + ' días';
+    return `<div class="day ${cls}" onclick="abrirFijo('${x.f.id}')"><div class="dn">${DSEM[x.fecha.getDay()]}</div><div class="dd">${x.fecha.getDate()}</div>${badge(x.f.nombre, 30, x.f.categoria)}<div class="dm">${money(x.f.monto)}</div><div class="st">${st}</div></div>`;
+  }).join('') || '<div class="empty">Sin pagos próximos</div>'}</div>
+  ${secH('Presupuesto del mes', `<button class="more" onclick="editPresupuesto()">Ajustar</button>`)}
+  <div class="card">
+    <div class="rowx"><div><div class="lbl">Te queda</div><div style="font-size:28px;font-weight:800;color:${usado > 1 ? 'var(--bad)' : 'var(--ok)'}">${money(c.presupuesto - c.gastoMes)}</div></div>
+    <div style="text-align:right"><div class="lbl">Presupuesto</div><div style="font-size:22px;font-weight:800">${money(c.presupuesto)}</div></div></div>
+    <div class="bar" style="margin:12px 0 8px"><i style="width:${Math.min(100, usado * 100)}%;background:${usado > 1 ? 'var(--bad)' : usado > .85 ? 'var(--warn)' : 'var(--pri)'}"></i></div>
+    <div class="rowx lbl"><span>Gastado: ${money(c.gastoMes)}</span><span>${Math.round(usado * 100)}% usado</span></div>
+  </div>
+  ${secH('Metas de ahorro', `<button class="more" onclick="SUB='metas';go('metas')">Ver todas</button>`)}
+  <div class="rings">${metas.map((m, i) => {
+    const p = m.objetivo ? m.ahorrado / m.objetivo : 0;
+    return `<div class="ringc" onclick="SUB='metas';go('metas')">${ring(p, META_COL[i % META_COL.length], metaEmoji(m.nombre), Math.round(p * 100) + '%')}<div class="t">${esc(m.nombre)}</div><div class="lbl" style="font-size:11.5px">${money(m.ahorrado)} / ${money(m.objetivo)}</div></div>`;
+  }).join('') || '<div class="empty">Crea tu primera meta</div>'}</div>
+  ${secH('Esta semana')}
+  <div class="card">${c.sems.map(s => `<div class="mbar"><div class="rowx"><span>${catE(s.categoria)} ${esc(s.nombre)}</span><span class="lbl">${money(s.gastado)} de ${money(s.monto)}</span></div><div class="bar"><i style="width:${Math.min(100, s.gastado / (s.monto || 1) * 100)}%;background:${s.gastado > s.monto ? 'var(--bad)' : catC(s.categoria)}"></i></div></div>`).join('') || '<div class="empty">Sin presupuestos semanales</div>'}</div>
+  <div class="card" onclick="go('subs')" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+    ${badge('Suscripciones', 42, 'Suscripciones')}<div style="flex:1"><div style="font-weight:700">Suscripciones y pagos fijos</div><div class="lbl">${mensuales().length} pagos · ${ingresosFijos().length} ingresos fijos · ${money(subsM)}/mes en suscripciones</div></div><span class="more">Ver ›</span></div>
+  ${secH('Últimos movimientos', `<button class="more" onclick="go('movs')">Ver todos</button>`)}
+  <div class="card">${movs.map(itemMov).join('') || '<div class="empty">Toca + para registrar tu primer movimiento</div>'}</div>`;
+}
+function itemMov(m) {
+  const rech = m.tipo === 'rechazado', mas = m.tipo === 'ingreso' || m.tipo === 'retiro_ahorro';
+  const s = mas ? '+' : rech ? '' : '-', col = m.tipo === 'ingreso' ? 'pos' : (m.tipo === 'gasto') ? '' : 'mut';
+  const tg = /^apartado:/.test(m.fuente) ? '<span class="tag">apartado</span>' : m.tipo === 'ahorro' ? '<span class="tag ok">ahorro</span>' : rech ? '<span class="tag bad">rechazado</span>' : m.fuente === 'correo' || m.fuente === 'sms' || m.fuente === 'Wallet' ? '<span class="tag">auto</span>' : '';
+  return `<div class="item" onclick="editMov('${m.id}')">${badge(m.descripcion, 40, m.categoria)}<div class="mid"><div class="t">${esc(m.descripcion || m.categoria)}</div><div class="s">${esc(m.categoria)} · ${fcorta(pd(m.fecha))}${tg}</div></div>
+  <div class="r ${col}" style="${rech ? 'text-decoration:line-through' : ''}">${s}${money2(m.monto)}</div></div>`;
+}
+
+/* ================= MOVIMIENTOS ================= */
+function vMovs() {
+  return topbar('Movimientos', '', '', true) + `
+  <input class="search" placeholder="Buscar (ej. Oxxo, Didi, gasolina)" value="${esc(MQ)}" oninput="MQ=this.value;pintarMovs()">
+  <div class="chips" style="margin-top:6px">${[['todos', 'Todos'], ['gasto', 'Gastos'], ['ingreso', 'Ingresos'], ['ahorro', 'Ahorro'], ['rechazado', 'Rechazados']].map(([k, l]) => `<button class="chip ${MF === k ? 'on' : ''}" onclick="MF='${k}';render()">${l}</button>`).join('')}</div>
+  <div id="movlist"></div>`;
+}
+function pintarMovs() {
+  const q = MQ.toLowerCase().trim();
+  const L = DB.movimientos.filter(m => (MF === 'todos' || m.tipo === MF || (MF === 'ahorro' && m.tipo === 'retiro_ahorro')) && (!q || (m.descripcion + ' ' + m.categoria).toLowerCase().includes(q)))
+    .sort((a, b) => pd(b.fecha) - pd(a.fecha));
+  const g = {}; L.forEach(m => (g[m.fecha] = g[m.fecha] || []).push(m));
+  $('#movlist').innerHTML = Object.keys(g).map(f => `<div class="datehead">${flarga(pd(f))}</div><div class="card" style="margin-top:6px;padding:4px 16px">${g[f].map(itemMov).join('')}</div>`).join('') || '<div class="empty">Sin resultados</div>';
+}
+
+/* ================= CALENDARIO ================= */
+function vCal(c) {
+  if (!CAL) CAL = { y: c.hoy.getFullYear(), m: c.hoy.getMonth(), sel: c.hoy.getDate() };
+  const { y, m } = CAL, first = (new Date(y, m, 1).getDay() + 6) % 7, n = dim(y, m);
+  const lista = cobros(new Date(y, m, 1), new Date(y, m, n), recurrentes());
+  const deDia = d => lista.filter(x => x.fecha.getDate() === d);
+  let cells = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(x => `<div class="h">${x}</div>`).join('') + '<div></div>'.repeat(first);
+  for (let d = 1; d <= n; d++) {
+    const dt = new Date(y, m, d), cls = ['cd'], xs = deDia(d);
+    if (dt.getDay() === 5) cls.push('pay');
+    if (dias(dt, c.hoy) === 0) cls.push('today');
+    if (CAL.sel === d) cls.push('sel');
+    if (xs.length) cls.push('has');
+    cells += `<div class="${cls.join(' ')}" onclick="CAL.sel=${d};render()">${d}${xs.length ? `<span class="mk">${badge(xs[0].f.nombre, 18, xs[0].f.categoria)}</span>` : ''}${xs.length > 1 ? `<span class="n">${xs.length}</span>` : ''}</div>`;
+  }
+  const sd = CAL.sel ? new Date(y, m, CAL.sel) : null;
+  const fd = sd ? deDia(CAL.sel) : [], md = sd ? DB.movimientos.filter(x => dias(pd(x.fecha), sd) === 0) : [];
+  const prox = cobros(c.hoy, addD(c.hoy, 60), recurrentes()).filter(x => !x.pagado).slice(0, 6);
+  return `<div class="top"><button class="ibtn" onclick="mesNav(-1)">${I.back}</button><h1 style="flex:1;text-align:center;font-size:22px">${cap1(MES[m])} ${y}</h1><button class="ibtn" style="transform:scaleX(-1)" onclick="mesNav(1)">${I.back}</button></div>
+  <div class="card"><div class="cal">${cells}</div>
+  <div class="legend"><span><i style="border:1.5px dashed var(--ok);background:none"></i>Viernes de cobro</span><span><i style="background:var(--pri)"></i>Hoy</span><span><i style="background:#4f9dff"></i>Pago fijo</span><span><i style="background:#9d2449"></i>Ingreso fijo</span></div></div>
+  ${sd ? secH(cap1(flarga(sd)), `<span class="lbl">${fd.filter(x => !esIng(x.f)).length ? money(sum(fd.filter(x => !esIng(x.f)), x => x.f.monto)) : ''}</span>`) + `<div class="card" style="padding:4px 16px">
+    ${sd.getDay() === 5 ? `<div class="item">${badge('Gallito', 40)}<div class="mid"><div class="t">Día de cobro</div><div class="s">${esc(DB.config.TRABAJO || 'Trabajo')}</div></div><div class="r pos">💰</div></div>` : ''}
+    ${fd.map(x => itemFijo(x.f, x.fecha, x.pagado)).join('')}${md.map(itemMov).join('')}
+    ${fd.length + md.length || sd.getDay() === 5 ? '' : '<div class="empty">Nada este día</div>'}</div>` : ''}
+  ${secH('Lo que viene', `<button class="more" onclick="go('subs')">Todos</button>`)}
+  <div class="card" style="padding:4px 16px">${prox.map(x => itemFijo(x.f, x.fecha, x.pagado)).join('') || '<div class="empty">Todo pagado por ahora 🎉</div>'}</div>`;
+}
+function itemFijo(f, fecha, pagado) {
+  const n = fecha ? dias(fecha, new Date()) : null, ing = esIng(f);
+  const tg = !fecha ? '' : pagado ? `<span class="tag ok">${ing ? 'Llegó' : 'Pagado'}</span>` : n < 0 ? `<span class="tag bad">${ing ? '¿Ya llegó?' : 'Vencido'}</span>` : n <= 3 ? `<span class="tag ${ing ? 'ok' : 'warn'}">${enDias(n)}</span>` : `<span class="tag">${enDias(n)}</span>`;
+  const cuando = f.frecuencia === 'semanal' ? FREQ.semanal : (fecha ? fcorta(fecha) : 'Día ' + f.dia) + ' · ' + FREQ[f.frecuencia];
+  return `<div class="item" onclick="abrirFijo('${f.id}')">${badge(f.nombre, 40, f.categoria)}<div class="mid"><div class="t">${esc(f.nombre)}</div><div class="s">${cuando}${tg}</div></div><div class="r ${ing ? 'pos' : ''}">${ing ? '+' : ''}${money2(f.monto)}</div></div>`;
+}
+function mesNav(k) { CAL.m += k; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; render(); }
+
+/* ================= SUSCRIPCIONES ================= */
+function vSubs(c) {
+  const ms = mensuales(), subs = ms.filter(f => f.categoria === 'Suscripciones'), otros = ms.filter(f => f.categoria !== 'Suscripciones');
+  const pausa = DB.fijos.filter(f => f.activo === 'no');
+  const next = f => { const o = cobros(c.hoy, addD(c.hoy, 75), [f]).find(x => !x.pagado); return o ? o.fecha : null; };
+  const ord = a => a.map(f => [f, next(f)]).sort((a, b) => (a[1] || 9e15) - (b[1] || 9e15));
+  const it = ([f, d]) => itemFijo(f, d, !d);
+  return topbar('Suscripciones', 'Pagos fijos', `<button class="ibtn" onclick="editFijo()">${I.plus}</button>`, true) + `
+  <div class="card hero"><div class="lbl">Total al mes (pagos fijos)</div><div class="amount">${money2(sum(ms, alMes))}</div>
+  <div class="lbl">De eso, <b>${money(sum(subs, alMes))}</b> son suscripciones.</div></div>
+  <div class="stats"><div><span class="lbl">Proyección anual</span><b>${money(sum(ms, alMes) * 12)}</b></div><div><span class="lbl">Activas</span><b>${ms.length} pagos</b></div></div>
+  ${ingresosFijos().length ? secH('Ingresos fijos') + `<div class="card" style="padding:4px 16px">${ord(ingresosFijos()).map(it).join('')}</div>` : ''}
+  ${secH('Suscripciones')}<div class="card" style="padding:4px 16px">${ord(subs).map(it).join('') || '<div class="empty">Sin suscripciones</div>'}</div>
+  ${secH('Otros pagos fijos')}<div class="card" style="padding:4px 16px">${ord(otros).map(it).join('') || '<div class="empty">Nada</div>'}</div>
+  ${secH('Presupuestos semanales')}<div class="card" style="padding:4px 16px">${semanales().map(f => itemFijo(f)).join('') || '<div class="empty">Nada</div>'}</div>
+  ${pausa.length ? secH('Pausados') + `<div class="card" style="padding:4px 16px;opacity:.7">${pausa.map(f => itemFijo(f)).join('')}</div>` : ''}`;
+}
+function abrirFijo(id) {
+  const f = DB.fijos.find(x => x.id === id); if (!f) return;
+  const hoy = sod(new Date());
+  const ing = esIng(f), nx = f.frecuencia !== 'semanal' ? cobros(addD(hoy, -25), addD(hoy, 75), [f]).find(x => !x.pagado || x.fecha >= hoy) : null;
+  const n = nx ? dias(nx.fecha, hoy) : null;
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<div class="bigb">${badge(f.nombre, 72, f.categoria)}<h2 style="margin-top:12px">${esc(f.nombre)}</h2>
+    <div class="lbl">${ing ? 'Ingreso fijo' : esc(f.categoria)} · ${FREQ[f.frecuencia] || ''}${f.activo === 'no' ? ' · Pausado' : ''}</div>
+    <div style="font-size:30px;font-weight:800;margin:8px 0" class="${ing ? 'pos' : ''}">${ing ? '+' : ''}${money2(f.monto)}<span class="lbl" style="font-size:14px"> / ${{ mensual: 'mes', bimestral: '2 meses', semanal: 'semana' }[f.frecuencia]}</span></div></div>
+    ${nx ? `<div class="card" style="display:flex;align-items:center;gap:12px"><span class="badge" style="width:40px;height:40px;background:var(--soft);font-size:19px">📅</span><div style="flex:1"><div class="lbl">${ing ? 'PRÓXIMO DEPÓSITO' : 'PRÓXIMO COBRO'}</div><div style="font-weight:700">${cap1(flarga(nx.fecha))}</div></div>
+      <span class="tag ${nx.pagado ? 'ok' : n < 0 ? 'bad' : n <= 3 ? 'warn' : ''}">${nx.pagado ? (ing ? 'Llegó' : 'Pagado') : n < 0 ? (ing ? '¿Ya llegó?' : 'Vencido') : enDias(n)}</span></div>` : ''}
+    <div class="card"><div class="lbl">NOTAS</div><div style="margin-top:4px;white-space:pre-wrap">${esc(f.notas) || '<span class="mut">Sin notas. Ej. “cancelar antes del día 20”.</span>'}</div></div>
+    ${nx && !nx.pagado ? `<button class="btn full" onclick="cerrar();pagarFijo('${f.id}')">${ing ? '💰 Ya me llegó' : 'Ya se pagó'}</button>` : ''}
+    <div class="btns"><button class="btn sec" style="flex:1" onclick="editFijo('${f.id}')">Editar</button>
+    <button class="btn sec" style="flex:1" onclick="cerrar();api('guardar','Fijos',{id:'${f.id}',activo:'${f.activo === 'no' ? 'si' : 'no'}'}).then(()=>toast('${f.activo === 'no' ? '▶️ Reactivado' : '⏸ Pausado'}'))">${f.activo === 'no' ? 'Reactivar' : 'Pausar'}</button></div>`;
+  $('#modal').classList.add('on');
+}
+
+/* ================= ANÁLISIS ================= */
+function rango(per, hoy) {
+  const fin = addD(hoy, 1), b = [];
+  if (per === 'sem') { const a = lastFriday(hoy); for (let d = new Date(a); d < fin; d = addD(d, 1)) b.push({ l: DSEM[d.getDay()], a: d, z: addD(d, 1) }); return { a, z: fin, b, t: 'esta semana de pago' }; }
+  if (per === 'mes') { const a = new Date(hoy.getFullYear(), hoy.getMonth(), 1); for (let d = new Date(a); d < fin; d = addD(d, 7)) b.push({ l: fcorta(d), a: d, z: addD(d, 7) }); return { a, z: fin, b, t: MES[hoy.getMonth()] }; }
+  if (per === '3m') { const a = addD(hoy, -90); for (let d = new Date(a); d < fin; d = addD(d, 7)) b.push({ l: fcorta(d), a: d, z: addD(d, 7) }); return { a, z: fin, b, t: 'últimos 3 meses' }; }
+  const k = per === '6m' ? 6 : 12;
+  for (let i = k - 1; i >= 0; i--) { const a = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1); b.push({ l: MES[a.getMonth()].slice(0, 3), a, z: new Date(a.getFullYear(), a.getMonth() + 1, 1) }); }
+  return { a: b[0].a, z: fin, b, t: per === '6m' ? 'últimos 6 meses' : 'último año' };
+}
+function vAnalisis(c) {
+  const R = rango(PER, c.hoy), G = DB.movimientos.filter(m => m.tipo === 'gasto' && pd(m.fecha) >= R.a && pd(m.fecha) < R.z);
+  const porCat = {}; G.forEach(m => porCat[m.categoria] = (porCat[m.categoria] || 0) + m.monto);
+  const cats = Object.entries(porCat).sort((a, b) => b[1] - a[1]), tot = sum(cats, x => x[1]);
+  const porCom = {}; G.forEach(m => { const k = (m.descripcion || m.categoria).trim(); porCom[k] = porCom[k] || { v: 0, cat: m.categoria }; porCom[k].v += m.monto; });
+  const coms = Object.entries(porCom).sort((a, b) => b[1].v - a[1].v).slice(0, 6), maxC = coms[0] ? coms[0][1].v : 1;
+  const ing = sum(DB.movimientos.filter(m => m.tipo === 'ingreso' && pd(m.fecha) >= R.a && pd(m.fecha) < R.z));
+  const esperado = c.proyMes * c.hoy.getDate() / dim(c.hoy.getFullYear(), c.hoy.getMonth()), mx = Math.max(esperado, c.gastoMes, 1);
+  const disc = cats.filter(([k]) => ['Comida', 'Gustos', 'Otros', 'Efectivo', 'Transporte'].includes(k))[0];
+  return topbar('Análisis', 'Tus números') + `
+  <div class="chips" style="margin:6px -16px 4px">${[['sem', 'Semana'], ['mes', 'Mes'], ['3m', '3 meses'], ['6m', '6 meses'], ['ano', 'Año']].map(([k, l]) => `<button class="chip ${PER === k ? 'on' : ''}" onclick="PER='${k}';render()">${l}</button>`).join('')}</div>
+  <div class="stats" style="margin-top:12px"><div><span class="lbl">Ingresos</span><b class="pos">${money(ing)}</b></div><div><span class="lbl">Gastos</span><b class="neg">${money(tot)}</b></div></div>
+  ${secH('Gastos por categoría', `<span class="lbl">${R.t}</span>`)}
+  <div class="card">${tot ? `<div class="donutw"><div class="donut"><canvas id="pie" width="150" height="150"></canvas><div class="ctr"><b>${money(tot)}</b><span>Total</span></div></div>
+    <div class="lg">${cats.slice(0, 6).map(([k, v]) => `<div class="li"><i style="background:${catC(k)}"></i><span class="n">${catE(k)} ${esc(k)}<br><span class="lbl">${money(v)}</span></span><span class="p">${Math.round(v / tot * 100)}%</span></div>`).join('')}</div></div>` : '<div class="empty">Sin gastos en este periodo</div>'}</div>
+  ${secH('Dónde gastas más')}
+  <div class="card">${coms.map(([k, o]) => `<div class="mbar"><div class="rowx"><span style="font-weight:600">${esc(k)}</span><b>${money(o.v)}</b></div><div class="bar"><i style="width:${o.v / maxC * 100}%;background:${catC(o.cat)}"></i></div></div>`).join('') || '<div class="empty">Sin gastos</div>'}</div>
+  ${secH('Ingresos vs gastos')}
+  <div class="card"><canvas id="linea" height="210"></canvas></div>
+  ${secH('✨ Insights del mes')}
+  <div class="card ins">
+    <div><div class="rowx"><span class="lbl">Gasto esperado a hoy</span><b>${money(esperado)}</b></div><div class="bar"><i style="width:${esperado / mx * 100}%;background:var(--mut)"></i></div></div>
+    <div><div class="rowx"><span class="lbl">Gasto real</span><b class="${c.gastoMes > esperado ? 'neg' : 'pos'}">${money(c.gastoMes)}</b></div><div class="bar"><i style="width:${c.gastoMes / mx * 100}%;background:${c.gastoMes > esperado ? 'var(--bad)' : 'var(--pri)'}"></i></div></div>
+    <div class="tip" style="margin:4px 0 0;background:var(--card2)"><span class="e">${c.gastoMes > esperado ? '📉' : '✅'}</span><span>${c.gastoMes > esperado ? `Vas <b>${money(c.gastoMes - esperado)}</b> arriba de lo planeado este mes.` : `Vas <b>${money(esperado - c.gastoMes)}</b> abajo de lo planeado. ¡Bien!`}
+    ${disc ? ` Si recortas 15% en <b>${catE(disc[0])} ${esc(disc[0])}</b> te ahorras ~${money(disc[1] * .15)}.` : ''}</span></div>
+  </div>
+  ${secH('Cuánto tienes')}
+  <div class="card"><canvas id="saldo" height="180"></canvas></div>`;
+}
+function dibujar(c) {
+  if (!window.Chart) return;
+  const cs = getComputedStyle(document.documentElement), mut = cs.getPropertyValue('--mut').trim(), line = cs.getPropertyValue('--line').trim(), pri = cs.getPropertyValue('--pri').trim(), bad = cs.getPropertyValue('--bad').trim(), card = cs.getPropertyValue('--card').trim();
+  Chart.defaults.color = mut; Chart.defaults.font.family = '-apple-system,system-ui,sans-serif'; Chart.defaults.font.size = 11;
+  const R = rango(PER, c.hoy);
+  const G = DB.movimientos.filter(m => m.tipo === 'gasto' && pd(m.fecha) >= R.a && pd(m.fecha) < R.z);
+  const porCat = {}; G.forEach(m => porCat[m.categoria] = (porCat[m.categoria] || 0) + m.monto);
+  const cats = Object.entries(porCat).sort((a, b) => b[1] - a[1]);
+  if ($('#pie')) charts.push(new Chart($('#pie'), { type: 'doughnut', data: { labels: cats.map(x => x[0]), datasets: [{ data: cats.map(x => Math.round(x[1])), backgroundColor: cats.map(x => catC(x[0])), borderColor: card, borderWidth: 3 }] }, options: { cutout: '70%', responsive: false, plugins: { legend: { display: false } } } }));
+  const In = [], Ga = [];
+  R.b.forEach(k => { const w = DB.movimientos.filter(m => pd(m.fecha) >= k.a && pd(m.fecha) < k.z); In.push(Math.round(sum(w.filter(m => m.tipo === 'ingreso')))); Ga.push(Math.round(sum(w.filter(m => m.tipo === 'gasto')))); });
+  const grad = (ctx, col) => { const g = ctx.createLinearGradient(0, 0, 0, 210); g.addColorStop(0, col + '55'); g.addColorStop(1, col + '00'); return g; };
+  const hex = v => v.startsWith('#') ? v : '#22c55e';
+  const sc = { x: { grid: { display: false } }, y: { grid: { color: line }, border: { display: false }, ticks: { callback: v => '$' + v.toLocaleString('es-MX') } } };
+  const ctxL = $('#linea').getContext('2d');
+  charts.push(new Chart(ctxL, { type: 'line', data: { labels: R.b.map(k => k.l), datasets: [
+    { label: 'Ingresos', data: In, borderColor: hex(pri), backgroundColor: grad(ctxL, hex(pri)), fill: true, tension: .4, pointRadius: 3, borderWidth: 2.5 },
+    { label: 'Gastos', data: Ga, borderColor: hex(bad), backgroundColor: grad(ctxL, hex(bad)), fill: true, tension: .4, pointRadius: 3, borderWidth: 2.5 }] },
+    options: { scales: sc, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { usePointStyle: true, boxWidth: 8 } } } } }));
+  const signo = m => (m.tipo === 'ingreso' || m.tipo === 'retiro_ahorro') ? m.monto : (m.tipo === 'gasto' || m.tipo === 'ahorro') ? -m.monto : 0;
+  const ini = +DB.config.SALDO_INICIAL || 0;
+  const S = R.b.map(k => Math.round(ini + sum(DB.movimientos.filter(m => pd(m.fecha) < k.z), signo)));
+  const ctxS = $('#saldo').getContext('2d');
+  charts.push(new Chart(ctxS, { type: 'line', data: { labels: R.b.map(k => k.l), datasets: [{ label: 'Saldo', data: S, borderColor: hex(pri), backgroundColor: grad(ctxS, hex(pri)), fill: true, tension: .4, pointRadius: 0, borderWidth: 2.5 }] }, options: { scales: sc, plugins: { legend: { display: false } } } }));
+}
+
+/* ================= METAS Y DEUDAS ================= */
+function vMetas(c) {
+  return topbar('Metas y deudas', '', SUB === 'metas' && MODO() !== 'demo' ? `<button class="ibtn" onclick="refrescarMetas()" aria-label="Actualizar precios">${I.ref}</button>` : '') + `
+  <div class="seg" style="margin:8px 0 4px"><button class="${SUB === 'metas' ? 'on' : ''}" onclick="SUB='metas';render()">Metas de ahorro</button><button class="${SUB === 'deudas' ? 'on' : ''}" onclick="SUB='deudas';render()">Deudas</button></div>
+  ${SUB === 'metas' ? vMetasL(c) : vDeudas()}`;
+}
+function vMetasL(c) {
+  const ms = DB.metas.slice().sort((a, b) => a.prioridad - b.prioridad), extra = c.didiProm ? Math.round(c.didiProm * 2) : 300;
+  return `<div class="tip"><span class="e">📈</span><span>Ahorras en promedio <b>${money(c.ahorroSem)}</b> por semana (últimas 4 semanas).</span></div>
+  ${ms.map((m, i) => {
+    const col = META_COL[i % META_COL.length], p = m.objetivo ? Math.min(1, m.ahorrado / m.objetivo) : 0, r = Math.max(0, m.objetivo - m.ahorrado);
+    const sNow = c.ahorroSem > 0 ? Math.ceil(r / c.ahorroSem) : null, sDidi = Math.ceil(r / (c.ahorroSem + extra));
+    const img = /^(https?:|data:image)/.test(m.imagen || '') ? `<img src="${esc(m.imagen)}" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none'">` : '';
+    return `<div class="goal" style="border-color:color-mix(in srgb,${col} 55%,var(--line));background:color-mix(in srgb,${col} 8%,var(--card))">
+      ${img ? `<div class="prod">${img}<div style="flex:1;min-width:0"><div class="ttl">${esc(m.nombre)}</div><div class="lbl">${m.tienda ? esc(m.tienda) : ''}${m.precio ? ' · ' + money(m.precio) : ''}${m.precio && m.objetivo && Math.abs(m.precio - m.objetivo) > 1 ? ` <span class="tag ${m.precio < m.objetivo ? 'ok' : 'bad'}">${m.precio < m.objetivo ? 'bajó' : 'subió'}</span>` : ''}</div>${m.link ? `<a class="lnk" href="${esc(m.link)}" target="_blank" rel="noopener">Ver artículo ↗</a>` : ''}</div></div>`
+      : `<div class="rowx" style="align-items:center"><div class="ttl">${metaEmoji(m.nombre)} ${esc(m.nombre)}</div>${p >= .8 && p < 1 ? '<span class="tag ok">¡Falta poco!</span>' : p >= 1 ? '<span class="tag ok">¡Cumplida!</span>' : ''}</div>`}
+      <div class="bar" style="margin:12px 0 8px;height:10px"><i style="width:${p * 100}%;background:${col}"></i></div>
+      <div class="rowx"><span class="pct" style="color:${col}">${Math.round(p * 100)}%</span><span><b style="color:${col}">${money(m.ahorrado)}</b> <span class="lbl">de ${money(m.objetivo)} MXN</span></span></div>
+      ${r > 0 ? `<div class="hint">💡 <span>${sNow ? `A tu ritmo llegas en <b>~${sNow} sem</b>. ` : ''}Con ${money(extra)} extra de Didi por semana, en <b>~${sDidi} sem</b>.</span></div>` : ''}
+      <div class="btns">${r > 0 ? `<button class="btn sm" onclick="abonarMeta('${m.id}')">+ Abonar</button>` : ''}<button class="btn sm sec" onclick="editMeta('${m.id}')">Editar</button></div></div>`;
+  }).join('')}
+  <button class="btn sec full" onclick="editMeta()">+ Nueva meta</button>`;
+}
+function vDeudas() {
+  const act = DB.deudas.filter(d => d.estado !== 'pagada'), debo = act.filter(d => d.direccion === 'debo'), meDeben = act.filter(d => d.direccion !== 'debo'), pag = DB.deudas.filter(d => d.estado === 'pagada');
+  const it = d => `<div class="item">${badge(d.persona, 40)}<div class="mid" onclick="editDeuda('${d.id}')"><div class="t">${esc(d.persona)}</div><div class="s">${esc(d.concepto || '')}${d.pendiente < d.monto ? ' · de ' + money(d.monto) : ''} · ${fcorta(pd(d.fecha))}</div></div>
+    <div class="r"><div class="${d.direccion === 'debo' ? 'neg' : 'pos'}">${money(d.pendiente)} MXN</div><button class="btn sm ${d.direccion === 'debo' ? 'sec' : ''}" style="margin-top:6px" onclick="abonarDeuda('${d.id}')">${d.direccion === 'debo' ? 'Pagar' : 'Cobrado ✓'}</button></div></div>`;
+  return `<div class="tot"><div><span class="lbl">Yo debo</span><b class="neg">${money(sum(debo, x => x.pendiente))}</b></div><div><span class="lbl">Me deben</span><b class="pos">${money(sum(meDeben, x => x.pendiente))}</b></div></div>
+  ${secH('Le debo')}<div class="card" style="padding:4px 16px">${debo.map(it).join('') || '<div class="empty">No debes nada 🙌</div>'}</div>
+  ${secH('Me deben')}<div class="card" style="padding:4px 16px">${meDeben.map(it).join('') || '<div class="empty">Nadie te debe</div>'}</div>
+  <button class="btn full" onclick="editDeuda()">+ Agregar deuda</button>
+  ${pag.length ? secH('Pagadas') + `<div class="card" style="padding:4px 16px;opacity:.7">${pag.map(d => `<div class="item" onclick="editDeuda('${d.id}')"><div class="mid"><div class="t">${esc(d.persona)}</div></div><div class="r mut">${money(d.monto)} ✓</div></div>`).join('')}</div>` : ''}`;
+}
+
+/* ================= CAPTURA RÁPIDA ================= */
+let CAP = null;
+function abrirCaptura(m) {
+  CAP = m ? { id: m.id, tipo: m.tipo === 'ingreso' ? 'ingreso' : 'gasto', s: String(+m.monto), cat: m.categoria, desc: m.descripcion || '', fecha: m.fecha }
+          : { id: null, tipo: 'gasto', s: '', cat: 'Comida', desc: '', fecha: ymd(new Date()) };
+  $('#sheet').className = 'sheet full'; pintarCap(); $('#modal').classList.add('on');
+}
+function pintarCap() {
+  const ing = CAP.tipo === 'ingreso', trab = DB.config.TRABAJO || 'Trabajo';
+  const quick = ing ? [[1400, `+$1,400 ${esc(trab.replace(/^El\s+/i, ''))}`, 'Sueldo', trab]].concat(ingresosFijos().map(f => [f.monto, `+${money(f.monto)} ${esc(f.nombre.split(' ')[0])}`, f.categoria, f.nombre]), [[500, '+$500'], [200, '+$200']]) : [[50, '+$50'], [100, '+$100'], [200, '+$200'], [500, '+$500']];
+  const cats = ing ? [['Sueldo', '🏪 ' + trab], ['Didi', '🏍 Didi Moto'], ['Beca', '🏛 Beca'], ['Otros ingresos', '💰 Otro ingreso']] : CATS_G.map(k => [k, catE(k) + ' ' + k]);
+  $('#sheet').innerHTML = `<div class="cap-top"><button class="btn sec sm" onclick="cerrar()">‹ Volver</button><b>${CAP.id ? 'EDITAR' : 'NUEVA CAPTURA'}</b><span style="width:70px"></span></div>
+  <div class="seg"><button class="${!ing ? 'on' : ''}" onclick="capTipo('gasto')">− Gasto</button><button class="${ing ? 'on' : ''}" onclick="capTipo('ingreso')">+ Ingreso</button></div>
+  <div class="amt" id="amt"></div>
+  <div class="chips">${quick.map(q => `<button class="chip" onclick="capQuick(${q[0]},${q[2] ? `'${q[2]}'` : 'null'})">${q[1]}</button>`).join('')}</div>
+  <div class="keys">${['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'del'].map(k => `<button onclick="capKey('${k}')">${k === 'del' ? I.del : k}</button>`).join('')}</div>
+  <div class="chips">${cats.map(([k, l]) => `<button class="chip ${CAP.cat === k ? 'on' : ''}" onclick="CAP.cat='${k}';pintarCap()">${esc(l)}</button>`).join('')}</div>
+  <div class="cap-in"><input placeholder="Descripción (opcional)" value="${esc(CAP.desc)}" oninput="CAP.desc=this.value"><input type="date" value="${CAP.fecha}" onchange="CAP.fecha=this.value"></div>
+  <div style="flex:1"></div>
+  <button class="btn full" style="padding:16px;font-size:16px" onclick="capGuardar()">Guardar movimiento</button>
+  ${CAP.id ? `<button class="btn red full" onclick="cerrar();confirmar('¿Borrar este movimiento?',()=>api('borrar','Movimientos','${CAP.id}'))">Borrar</button>` : ''}`;
+  pintarAmt();
+}
+function pintarAmt() {
+  const s = CAP.s || '0', [e, d] = s.split('.');
+  $('#amt').innerHTML = `<span style="color:${CAP.tipo === 'ingreso' ? 'var(--ok)' : 'var(--tx)'}">$${Number(e || 0).toLocaleString('es-MX')}${d !== undefined ? '.' + d : ''}</span><small>MXN</small>`;
+}
+function capTipo(t) { CAP.tipo = t; CAP.cat = t === 'ingreso' ? 'Sueldo' : 'Comida'; pintarCap(); }
+function capKey(k) {
+  let s = CAP.s;
+  if (k === 'del') s = s.slice(0, -1);
+  else if (k === '.') { if (!s.includes('.')) s = (s || '0') + '.'; }
+  else { if (s.includes('.') && s.split('.')[1].length >= 2) return; if (s.replace('.', '').length >= 8) return; s = s === '0' ? k : s + k; }
+  CAP.s = s; pintarAmt();
+}
+function capQuick(v, cat) {
+  if (cat) { CAP.s = String(v); CAP.cat = cat; CAP.desc = cat === 'Sueldo' ? (DB.config.TRABAJO || '') : (ingresosFijos().find(f => f.categoria === cat) || {}).nombre || ''; pintarCap(); return; }
+  CAP.s = String(Math.round(((+CAP.s || 0) + v) * 100) / 100); pintarAmt();
+}
+function capGuardar() {
+  const monto = +CAP.s; if (!(monto > 0)) return toast('Escribe un monto');
+  const label = CAP.tipo === 'ingreso' && CAP.cat === 'Beca' ? 'Beca del Bienestar' : CAP.tipo === 'ingreso' && CAP.cat === 'Didi' ? 'Didi Moto' : CAP.cat === 'Sueldo' ? (DB.config.TRABAJO || 'Sueldo') : CAP.cat;
+  const o = { tipo: CAP.tipo, monto, categoria: CAP.cat, descripcion: CAP.desc.trim() || label, fecha: CAP.fecha || ymd(new Date()), fuente: CAP.cat === 'Didi' ? 'Didi' : 'Manual' };
+  const id = CAP.id, msg = o.tipo === 'ingreso' ? '💰 Ingreso guardado' : '✅ Gasto guardado'; cerrar();
+  (id ? api('updateMov', id, o) : api('addMov', o)).then(d => d && toast(msg));
+}
+document.addEventListener('keydown', e => {
+  if (!$('#modal').classList.contains('on') || !$('#sheet').classList.contains('full') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  if (/^[0-9.]$/.test(e.key)) capKey(e.key); else if (e.key === 'Backspace') capKey('del'); else if (e.key === 'Enter') capGuardar(); else if (e.key === 'Escape') cerrar();
+});
+
+/* ================= formularios ================= */
+function cerrar() { $('#modal').classList.remove('on'); }
+function form(titulo, campos, val, onOk, extra = '') {
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<h2>${titulo}</h2>` + campos.map(f => {
+    const v = val[f.k] ?? f.def ?? '';
+    if (f.op) return `<label>${f.l}</label><select id="f_${f.k}">${f.op.map(o => `<option value="${esc(o[0])}" ${String(o[0]) === String(v) ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select>`;
+    if (f.t === 'area') return `<label>${f.l}</label><textarea id="f_${f.k}" placeholder="${esc(f.ph || '')}">${esc(v)}</textarea>`;
+    return `<label>${f.l}</label><input id="f_${f.k}" type="${f.t || 'text'}" ${f.t === 'number' ? 'inputmode="decimal" step="any"' : ''} value="${esc(v)}" placeholder="${esc(f.ph || '')}">`;
+  }).join('') + `<div class="btns" style="margin-top:18px"><button class="btn" style="flex:1" id="okb">Guardar</button><button class="btn sec" onclick="cerrar()">Cancelar</button></div>${extra}`;
+  $('#modal').classList.add('on');
+  $('#okb').onclick = () => {
+    const o = {};
+    for (const f of campos) {
+      let x = $('#f_' + f.k).value.trim();
+      if (f.t === 'number') { x = parseFloat(x.replace(/[^\d.\-]/g, '')); if (isNaN(x)) x = 0; }
+      if (f.req && !x) return toast('Completa: ' + f.l);
+      o[f.k] = x;
+    }
+    cerrar(); onOk(o);
+  };
+}
+const op = a => a.map(x => [x, x]);
+function editMov(id) { const m = DB.movimientos.find(x => x.id === id); if (!m) return; if (['ahorro', 'rechazado', 'retiro_ahorro'].includes(m.tipo)) return confirmar('¿Borrar este movimiento?', () => api('borrar', 'Movimientos', id)); abrirCaptura(m); }
+function confirmar(txt, fn) {
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<h2 style="margin-bottom:14px">${txt}</h2><div class="btns"><button class="btn red" style="flex:1" id="okb">Sí, borrar</button><button class="btn sec" onclick="cerrar()">Cancelar</button></div>`;
+  $('#modal').classList.add('on'); $('#okb').onclick = () => { cerrar(); fn(); };
+}
+function pedirMonto(titulo, fn, def) { form(titulo, [{ k: 'monto', l: 'Monto', t: 'number', req: 1 }], { monto: def ?? '' }, o => fn(o.monto)); }
+function refrescarMetas() { toast('Leyendo tus links…'); api('actualizarMetasApp').then(d => d && toast('🔄 Metas actualizadas')); }
+function pagarFijo(id) { api('pagarFijo', id).then(d => d && toast('✅ Pago registrado')); }
+function abonarMeta(id) { pedirMonto('Abonar a la meta', n => api('abonarMeta', id, n).then(d => d && toast('🎯 ¡Bien! Abono guardado'))); }
+function abonarDeuda(id) { const d = DB.deudas.find(x => x.id === id); pedirMonto(d.direccion === 'debo' ? 'Pagar a ' + d.persona : '¿Cuánto te pagó ' + d.persona + '?', n => api('abonarDeuda', id, n).then(r => r && toast('✅ Registrado')), d.pendiente); }
+function btnBorrar(hoja, id) { return id ? `<button class="btn red full" onclick="cerrar();confirmar('¿Borrar?',()=>api('borrar','${hoja}','${id}'))">Borrar</button>` : ''; }
+function editFijo(id) {
+  const f = DB.fijos.find(x => x.id === id) || { frecuencia: 'mensual', categoria: 'Suscripciones', activo: 'si', tipo: 'gasto' };
+  form(id ? 'Editar fijo' : 'Nuevo pago o ingreso fijo', [
+    { k: 'tipo', l: '¿Es pago o ingreso?', op: [['gasto', '💸 Pago (sale dinero)'], ['ingreso', '💰 Ingreso (entra dinero)']] },
+    { k: 'nombre', l: 'Nombre', req: 1, ph: 'Ej. Spotify, Beca…' }, { k: 'monto', l: 'Monto', t: 'number', req: 1 },
+    { k: 'frecuencia', l: 'Frecuencia', op: [['mensual', 'Cada mes'], ['bimestral', 'Cada 2 meses'], ['semanal', 'Presupuesto semanal']] },
+    { k: 'inicio', l: 'Fecha de un pago o depósito (para saber cuándo toca)', t: 'date' },
+    { k: 'dia', l: 'Día del mes (se llena solo con la fecha)', t: 'number' }, { k: 'categoria', l: 'Categoría', op: op(CATS_G.concat(CATS_I)) },
+    { k: 'activo', l: 'Estado', op: [['si', 'Activo'], ['no', 'Pausado']] }, { k: 'notas', l: 'Notas', t: 'area', ph: 'Ej. cancelar antes del 20, plan familiar…' }
+  ], f, o => {
+    if (o.inicio) o.dia = pd(o.inicio).getDate();
+    if (o.tipo === 'ingreso' && CATS_G.includes(o.categoria)) o.categoria = /beca|bienestar/i.test(o.nombre) ? 'Beca' : 'Otros ingresos';
+    api('guardar', 'Fijos', Object.assign(o, { id: id || '' })).then(d => d && toast('✅ Guardado'));
+  }, btnBorrar('Fijos', id));
+}
+function editMeta(id) {
+  const m = DB.metas.find(x => x.id === id) || { prioridad: DB.metas.length + 1 };
+  form(id ? 'Editar meta' : 'Nueva meta', [
+    { k: 'link', l: 'Link del artículo (opcional: saca foto y precio solo)', ph: 'https://…' },
+    { k: 'nombre', l: 'Meta', ph: 'Ej. Casco nuevo (con link se llena solo)' }, { k: 'objetivo', l: '¿Cuánto cuesta?', t: 'number' },
+    { k: 'ahorrado', l: 'Ya tengo ahorrado', t: 'number' }, { k: 'prioridad', l: 'Prioridad (1 = la más importante)', t: 'number' }
+  ], m, o => { if (!o.nombre && !o.link) return toast('Pon un nombre o un link'); api('guardar', 'Metas', Object.assign(o, { id: id || '' })).then(d => d && toast('🎯 Meta guardada')); }, btnBorrar('Metas', id));
+}
+function editDeuda(id) {
+  const d = DB.deudas.find(x => x.id === id) || { direccion: 'debo', fecha: ymd(new Date()) };
+  const campos = [{ k: 'direccion', l: '¿Quién debe?', op: [['debo', 'Yo le debo'], ['medeben', 'Me debe a mí']] }, { k: 'persona', l: 'Persona o lugar', req: 1 },
+    { k: 'concepto', l: 'Concepto', ph: 'Ej. gasolina, préstamo…' }, { k: 'monto', l: 'Monto total', t: 'number', req: 1 }, { k: 'fecha', l: 'Fecha', t: 'date' }];
+  if (id) campos.push({ k: 'pendiente', l: 'Pendiente', t: 'number' });
+  form(id ? 'Editar deuda' : 'Nueva deuda', campos, d, o => { if (id) o.estado = o.pendiente <= 0 ? 'pagada' : 'pendiente'; api('guardar', 'Deudas', Object.assign(o, { id: id || '' })).then(r => r && toast('✅ Guardado')); }, btnBorrar('Deudas', id));
+}
+function editPresupuesto() {
+  const c = calc();
+  form('Presupuesto del mes', [{ k: 'p', l: `¿Cuánto quieres gastar al mes como máximo? (deja 0 para calcularlo solo: ~${money(c.proyMes)})`, t: 'number' }], { p: +DB.config.PRESUPUESTO_MES || 0 },
+    o => api('setConfig', 'PRESUPUESTO_MES', o.p || '').then(d => d && toast('✅ Presupuesto guardado')));
+}
+function ajustes() {
+  const c = DB.config;
+  form('Ajustes', [
+    { k: 'NOMBRE', l: 'Tu nombre' }, { k: 'TRABAJO', l: 'Dónde trabajas' },
+    { k: 'SALDO_INICIAL', l: 'Dinero que tenías al empezar', t: 'number' }, { k: 'COLCHON', l: 'Colchón mínimo que quieres tener', t: 'number' },
+    { k: 'TEMA', l: 'Apariencia', op: [['auto', 'Automático (como tu iPhone)'], ['dark', 'Oscuro'], ['light', 'Claro']] }
+  ], Object.assign({}, c, { TEMA: THEME }), async o => {
+    THEME = o.TEMA; LS.set('mf_theme', THEME); aplicarTema(); delete o.TEMA;
+    for (const k in o) if (String(o[k]) !== String(c[k] ?? '')) await api('setConfig', k, o[k]);
+    render(); toast('✅ Ajustes guardados');
+  }, (MODO() === 'web' && window.PublicKeyCredential ? (LS.get('mf_cred') ? `<button class="btn sec full" onclick="LS.del('mf_cred');cerrar();toast('Face ID desactivado')">🔓 Quitar bloqueo con Face ID</button>` : `<button class="btn full" onclick="activarFaceID()">🔐 Bloquear con Face ID</button>`) : '')
+   + (MODO() !== 'demo' ? `<button class="btn sec full" onclick="LS.del('mf_token');LS.del('mf_url');location.reload()">Cerrar sesión</button>` : ''));
+}
+function pedirToken() {
+  const web = !GAS;
+  const campos = (web ? [{ k: 'u', l: 'URL de tu app (la de Apps Script que termina en /exec)', req: 1, ph: 'https://script.google.com/macros/s/…/exec' }] : [])
+    .concat([{ k: 't', l: 'Tu token (está en la hoja Config)', req: 1 }]);
+  form('🔐 Conecta tu Bolsillo U', campos, { u: URL_API, t: TOKEN }, o => {
+    if (web) { URL_API = String(o.u).trim(); if (!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(URL_API)) { toast('Esa URL no parece de Apps Script'); return pedirToken(); } LS.set('mf_url', URL_API); }
+    TOKEN = String(o.t).trim().toUpperCase(); LS.set('mf_token', TOKEN);
+    $('#demo').classList.add('hidden'); toast('Conectando…'); api('getData').then(d => d && toast('✅ ¡Conectado!'));
+  }, web ? `<button class="btn sec full" onclick="cerrar();verDemo()">Solo ver la demo</button>` : '');
+}
+function verDemo() { $('#demo').classList.remove('hidden'); DB = norm(DEMO.getData()); render(); }
+
+/* ================= Face ID (WebAuthn, solo en la app publicada) ================= */
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64 = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+const reto = () => crypto.getRandomValues(new Uint8Array(32));
+async function activarFaceID() {
+  try {
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: reto(), rp: { name: 'Bolsillo U', id: location.hostname },
+      user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'bolsillo-u', displayName: 'Bolsillo U' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' }, timeout: 60000 } });
+    LS.set('mf_cred', b64(cred.rawId)); cerrar(); toast('🔐 Face ID activado');
+  } catch (e) { toast('No se pudo activar Face ID'); }
+}
+async function desbloquear() {
+  try {
+    await navigator.credentials.get({ publicKey: { challenge: reto(), rpId: location.hostname, allowCredentials: [{ type: 'public-key', id: unb64(LS.get('mf_cred')) }], userVerification: 'required', timeout: 60000 } });
+    $('#lock').classList.add('hidden'); arrancar();
+  } catch (e) { toast('No se pudo verificar. Intenta de nuevo.'); }
+}
+function aplicarTema() { if (THEME === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', THEME); }
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => THEME === 'auto' && render());
+
+/* ================= modo demo ================= */
+const DEMO = (() => {
+  const hoy = sod(new Date()), d = n => ymd(addD(hoy, -n)); let n = 100; const nid = () => 'd' + (n++);
+  const fijos = [['iCloud+', 178, 4, 'mensual', 'Suscripciones'], ['Claude', 399, 6, 'mensual', 'Suscripciones'], ['Google AI Pro', 395, 17, 'mensual', 'Suscripciones'], ['ChatGPT', 110, 21, 'mensual', 'Suscripciones'],
+    ['Plan de celular', 250, 24, 'mensual', 'Celular'], ['Google Fotos', 59, 28, 'mensual', 'Suscripciones'], ['Seguro', 450, 28, 'mensual', 'Moto'], ['Colegiatura', 600, 1, 'mensual', 'Escuela'],
+    ['Gasolina', 200, '', 'semanal', 'Gasolina'], ['Comida', 350, '', 'semanal', 'Comida'], ['Gustos', 120, '', 'semanal', 'Gustos'], ['Beca (ejemplo)', 3000, 27, 'bimestral', 'Beca']]
+    .map((r, i) => ({ id: 'f' + i, nombre: r[0], monto: r[1], dia: r[2], frecuencia: r[3], categoria: r[4], activo: 'si', notas: i === 5 ? 'Se puede cancelar: Google AI Pro ya trae 5 TB.' : '',
+      tipo: r[4] === 'Beca' ? 'ingreso' : 'gasto', inicio: r[4] === 'Beca' ? '2026-10-27' : '' }));
+  const db = {
+    config: { NOMBRE: 'Demo', TRABAJO: 'Mi trabajo', SALDO_INICIAL: '600', COLCHON: '100', INICIO: d(35), PRESUPUESTO_MES: '' }, fijos,
+    metas: [{ id: 'm1', nombre: 'Mantenimiento del celular', objetivo: 1500, ahorrado: 400, prioridad: 1 },
+      { id: 'm2', nombre: 'Casco integral (ejemplo con link)', objetivo: 1500, ahorrado: 150, prioridad: 2, link: 'https://example.com', tienda: 'Mercado Libre', precio: 1399, imagen: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='white'/><path d='M18 64a32 32 0 0 1 64-10v16H18z' fill='%2322c55e'/><rect x='50' y='50' width='34' height='12' rx='4' fill='%23131916'/></svg>" },
+      { id: 'm3', nombre: 'Laptop o moto nueva', objetivo: 15000, ahorrado: 1200, prioridad: 3 }],
+    deudas: [{ id: 'x1', persona: 'Escuela (ejemplo)', concepto: 'Colegiaturas atrasadas', direccion: 'debo', monto: 3000, pendiente: 2400, fecha: d(30), estado: 'pendiente' },
+      { id: 'x2', persona: 'Luis (ejemplo)', concepto: 'Gasolina', direccion: 'medeben', monto: 150, pendiente: 150, fecha: d(4), estado: 'pendiente' }],
+    movimientos: []
+  };
+  const add = (f, tipo, cat, desc, monto, fuente = 'Manual') => { if (f <= hoy) db.movimientos.push({ id: nid(), fecha: ymd(f), tipo, categoria: cat, descripcion: desc, monto, fuente }); };
+  const vie = lastFriday(hoy);
+  for (let w = 8; w >= 0; w--) {
+    const v = addD(vie, -7 * w);
+    add(v, 'ingreso', 'Sueldo', 'Mi trabajo', w === 2 ? 1250 : 1400, 'Mi trabajo');
+    add(addD(v, 1), 'gasto', 'Gasolina', 'Pemex', 200, 'Wallet');
+    add(addD(v, 1), 'gasto', 'Comida', 'Taquería', 120, 'Wallet');
+    add(addD(v, 3), 'gasto', 'Comida', 'Oxxo', 85, 'Wallet');
+    add(addD(v, 5), 'gasto', 'Comida', 'Cocina económica', 95, 'Wallet');
+    add(addD(v, 2), 'gasto', 'Gustos', 'Salida con amigos', w === 1 ? 180 : 90, 'Wallet');
+    if (w % 2) add(addD(v, 4), 'ingreso', 'Didi', 'Didi Moto', 260, 'Didi');
+    if (w < 4) add(addD(v, 1), 'ahorro', 'Metas', 'Ahorro: Mantenimiento del celular', 100, 'meta:m1');
+  }
+  fijos.filter(f => f.frecuencia === 'mensual' && f.tipo !== 'ingreso').forEach(f => { const o = ocurrenciaD(f, hoy.getFullYear(), hoy.getMonth() - 1); if (o >= pd(db.config.INICIO)) add(o, 'gasto', f.categoria, f.nombre, f.monto, 'fijo:' + f.id); });
+  add(addD(vie, 2), 'gasto', 'Efectivo', 'Retiro en cajero', 200, 'correo');
+  add(addD(vie, 3), 'rechazado', 'Rechazado', 'Amazon (rechazado)', 349, 'correo');
+  if (pd('2026-10-27') >= pd(db.config.INICIO)) add(pd('2026-10-27'), 'ingreso', 'Beca', 'Beca (ejemplo)', 3000, 'fijo:f11');
+  add(addD(hoy, -20), 'gasto', 'Escuela', 'Abono a Escuela (ejemplo)', 600, 'deuda:x1');
+  function ocurrenciaD(f, y, m) { return new Date(y, m, Math.min(f.dia || 1, dim(y, m))); }
+  const clone = () => JSON.parse(JSON.stringify(db)), L = h => h.toLowerCase();
+  const mov = (tipo, cat, desc, monto, fuente) => db.movimientos.push({ id: nid(), fecha: ymd(new Date()), tipo, categoria: cat, descripcion: desc, monto: +monto, fuente });
+  return {
+    getData: clone,
+    addMov: m => { db.movimientos.push({ id: nid(), ...m, monto: +m.monto, fecha: m.fecha || ymd(new Date()) }); return clone(); },
+    updateMov: (id, m) => { Object.assign(db.movimientos.find(x => x.id === id), m); return clone(); },
+    borrar: (h, id) => { db[L(h)] = db[L(h)].filter(x => x.id !== id); return clone(); },
+    guardar: (h, o) => { const a = db[L(h)]; if (o.id) Object.assign(a.find(x => x.id === o.id), o); else { o.id = nid(); if (h === 'Deudas') { o.pendiente = o.monto; o.estado = 'pendiente'; } if (h === 'Metas') { o.ahorrado = o.ahorrado || 0; o.nombre = o.nombre || 'Artículo'; } o.activo = o.activo || 'si'; a.push(o); } return clone(); },
+    abonarMeta: (id, m) => { const x = db.metas.find(x => x.id === id); x.ahorrado = +x.ahorrado + +m; mov('ahorro', 'Metas', 'Ahorro: ' + x.nombre, m, 'meta:' + id); return clone(); },
+    abonarDeuda: (id, m) => { const x = db.deudas.find(x => x.id === id); x.pendiente = Math.max(0, x.pendiente - m); x.estado = x.pendiente <= 0 ? 'pagada' : 'pendiente'; x.direccion === 'debo' ? mov('gasto', /escuela|univers/i.test(x.persona) ? 'Escuela' : 'Deudas', 'Abono a ' + x.persona, m, 'deuda:' + id) : mov('ingreso', 'Otros ingresos', 'Me pagó ' + x.persona, m, 'deuda:' + id); return clone(); },
+    pagarFijo: id => { const f = db.fijos.find(x => x.id === id); mov(f.tipo === 'ingreso' ? 'ingreso' : 'gasto', f.categoria, f.nombre, f.monto, 'fijo:' + id); return clone(); },
+    setConfig: (k, v) => { db.config[k] = v; return clone(); },
+    actualizarMetasApp: () => clone()
+  };
+})();
+
+/* ================= arranque ================= */
+aplicarTema();
+function arrancar() {
+  if (GAS || MODO() === 'web') return api('getData');
+  if (ES_ARCHIVO) return verDemo();
+  pedirToken(); // app publicada sin conectar todavía
+}
+if (MODO() === 'web' && LS.get('mf_cred') && window.PublicKeyCredential) { $('#lock').classList.remove('hidden'); desbloquear(); }
+else arrancar();
+</script>
+</body>
+</html>
